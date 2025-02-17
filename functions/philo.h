@@ -13,6 +13,7 @@
 #ifndef PHILO_H
 # define PHILO_H
 # include <pthread.h>
+# include <stdlib.h>
 
 typedef struct s_philo
 {
@@ -45,4 +46,5 @@ typedef struct s_program
 }					t_program;
 
 int	main(int argc, char **argv);
+int	ft_atoi(const char *str);
 #endif
