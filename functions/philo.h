@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:54:45 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/14 15:20:05 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/18 12:06:31 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define PHILO_H
 # include <pthread.h>
 # include <stdlib.h>
+# include <stdio.h>
 
 typedef struct s_philo
 {
@@ -45,6 +46,7 @@ typedef struct s_program
 	t_philo			*philos;
 }					t_program;
 
-int	main(int argc, char **argv);
-int	ft_atoi(const char *str);
+int		main(int argc, char **argv);
+int		ft_atoi(const char *str);
+void	*start(void *prog);
 #endif
