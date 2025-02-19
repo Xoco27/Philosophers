@@ -95,11 +95,13 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	initiate(argv, prog, forks, n);
-	n = 0;
-	threading(prog);
+	if (prog->philos[0].time_to_eat < prog->philos[0].time_to_die)
+		threading(prog);
+	// n = 0;
 	// while (n < prog->philos[0].num_of_philos)
 	// {
 	// 	printf("%d %d %p %p\n", n, prog->philos[n].num_times_to_eat, prog->philos[n].l_fork, prog->philos[n].r_fork);
 	// 	n++;
 	// }
+	free_and_destroy(prog, forks);
 }

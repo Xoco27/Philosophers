@@ -12,6 +12,11 @@
 
 #include "philo.h"
 
+static void	philo_eating(t_philo *philo)
+{
+
+}
+
 void	*start(void *temp)
 {
 	t_philo	*philo;

@@ -49,4 +49,5 @@ typedef struct s_program
 int		main(int argc, char **argv);
 int		ft_atoi(const char *str);
 void	*start(void *prog);
+size_t	get_current_time_ms();
 #endif

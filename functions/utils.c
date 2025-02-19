@@ -12,6 +12,34 @@
 
 #include "philo.h"
 
+void	free_and_destroy(t_program *prog, pthread_mutex_t *forks, int n)
+{
+	int	i;
+	i = 0;
+	pthread_mutex_destroy(&prog->dead_lock);
+	pthread_mutex_destroy(&prog->meal_lock);
+	pthread_mutex_destroy(&prog->write_lock);
+	while (i < n)
+	{
+		pthread_mutex_destroy(&forks[i]);
+		i++;
+	}
+	i = 0;
+	while (i < n)
+	{
+		free(prog->philos[i])
+		i++;
+	}
+	free(prog);
+}
+
+size_t	get_current_time_ms()
+{
+    struct timeval	tv;
+    gettimeofday(&tv, NULL);
+    return (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+}
+
 int	ft_atoi(const char *str)
 {
 	int	i;
