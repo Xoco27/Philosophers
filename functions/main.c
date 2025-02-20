@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/18 16:57:50 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/20 16:14:15 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 static void	initiate_rest(char **argv, t_program *prog, \
 	pthread_mutex_t *forks, int i)
 {
-	prog->philos[i].start_time = 0;
+	prog->philos[i].start_time = get_current_time();
 	if (argv[5] != NULL)
 		prog->philos[i].num_times_to_eat = ft_atoi(argv[5]);
 	prog->philos[i].dead = 0;
@@ -24,6 +24,7 @@ static void	initiate_rest(char **argv, t_program *prog, \
 	prog->philos[i].write_lock = &prog->write_lock;
 	prog->philos[i].dead_lock = &prog->dead_lock;
 	prog->philos[i].meal_lock = &prog->meal_lock;
+	prog->philos[i].prog = prog;
 }
 
 static void	initiate(char **argv, t_program *prog, \
@@ -31,7 +32,7 @@ static void	initiate(char **argv, t_program *prog, \
 {
 	int				i;
 
-	i = 0;
+	i = -1;
 	prog->dead_flag = 0;
 	pthread_mutex_init(&prog->dead_lock, NULL);
 	pthread_mutex_init(&prog->meal_lock, NULL);
@@ -43,9 +44,8 @@ static void	initiate(char **argv, t_program *prog, \
 	while (i < n)
 	{
 		prog->philos[i].id = i;
-		prog->philos[i].eating = 0;
 		prog->philos[i].meals_eaten = 0;
-		prog->philos[i].last_meal = 0;
+		prog->philos[i].last_meal = get_current_time();
 		prog->philos[i].time_to_die = ft_atoi(argv[2]);
 		prog->philos[i].time_to_eat = ft_atoi(argv[3]);
 		prog->philos[i].time_to_sleep = ft_atoi(argv[4]);
@@ -64,7 +64,10 @@ static void	threading(t_program *prog)
 	{
 		pthread_create(&prog->philos[n].thread, NULL, &start, \
 		(void *)&prog->philos[n]);
-		n++;
+		{
+			n++;
+			ft_usleep(100);
+		}
 	}
 	n = 0;
 	while (n < prog->philos[0].num_of_philos)
@@ -100,8 +103,8 @@ int	main(int argc, char **argv)
 	// n = 0;
 	// while (n < prog->philos[0].num_of_philos)
 	// {
-	// 	printf("%d %d %p %p\n", n, prog->philos[n].num_times_to_eat, prog->philos[n].l_fork, prog->philos[n].r_fork);
+	// 	printf("%d %d %p %p\n", prog->philos[n].meals_eaten, prog->philos[n].num_times_to_eat, prog->philos[n].l_fork, prog->philos[n].r_fork);
 	// 	n++;
 	// }
-	free_and_destroy(prog, forks);
+	free_and_destroy(prog, forks, n);
 }
