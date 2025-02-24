@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:33:29 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/20 16:14:17 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/24 16:39:53 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,12 @@ static void	philo_eating(t_philo *philo)
 	}
 	pthread_mutex_lock(philo->r_fork);
 	printf("philo %d took his right fork\n", philo->id);
+	if (is_he_dead(philo) == 1)
+	{
+		pthread_mutex_unlock(philo->l_fork);
+		pthread_mutex_unlock(philo->r_fork);
+		return ;
+	}
 	if ((get_current_time() - philo->last_meal) >= philo->time_to_die)
 	{
 		pthread_mutex_unlock(philo->l_fork);
@@ -34,6 +40,12 @@ static void	philo_eating(t_philo *philo)
 		philo->prog->dead_flag = 1;
 		printf("philo %d DIED\n", philo->id);
 		pthread_mutex_unlock(philo->dead_lock);
+		return ;
+	}
+	if (is_he_dead(philo) == 1)
+	{
+		pthread_mutex_unlock(philo->l_fork);
+		pthread_mutex_unlock(philo->r_fork);
 		return ;
 	}
 	printf("philo %d is eating\n", philo->id);
@@ -75,7 +87,21 @@ static void	philo_sleeping(t_philo *philo)
 
 static void	philo_thinking(t_philo *philo)
 {
+	int	time_to_think;
+
+	pthread_mutex_lock(philo->meal_lock);
+	time_to_think = (philo->time_to_die
+			- (get_current_time() - philo->last_meal)
+			- philo->time_to_eat) / 2;
+	pthread_mutex_unlock(philo->meal_lock);
+	if (time_to_think < 0)
+		time_to_think = 0;
+	if (time_to_think == 0)
+		time_to_think = 1;
+	if (time_to_think > 600)
+		time_to_think = 200;
 	printf("philo %d is thinking\n", philo->id);
+	ft_usleep(time_to_think);
 }
 
 void	*start(void *temp)
@@ -83,7 +109,8 @@ void	*start(void *temp)
 	t_philo	*philo;
 
 	philo = (t_philo *)temp;
-	while (philo->meals_eaten < philo->num_times_to_eat && philo->dead == 0)
+	while (philo->num_times_to_eat == -1
+		|| (philo->meals_eaten < philo->num_times_to_eat && philo->dead == 0))
 	{
 		if (is_he_dead(philo) == 1)
 			return (NULL);

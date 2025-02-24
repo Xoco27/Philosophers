@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/20 16:14:15 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/24 16:39:54 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@ static void	initiate_rest(char **argv, t_program *prog, \
 	prog->philos[i].start_time = get_current_time();
 	if (argv[5] != NULL)
 		prog->philos[i].num_times_to_eat = ft_atoi(argv[5]);
+	else
+		prog->philos[i].num_times_to_eat = -1;
 	prog->philos[i].dead = 0;
 	prog->philos[i].l_fork = &forks[i];
 	prog->philos[i].r_fork = &forks[(i + 1) % prog->philos[i].num_of_philos];
@@ -30,7 +32,7 @@ static void	initiate_rest(char **argv, t_program *prog, \
 static void	initiate(char **argv, t_program *prog, \
 	pthread_mutex_t *forks, int n)
 {
-	int				i;
+	int	i;
 
 	i = -1;
 	prog->dead_flag = 0;
@@ -38,6 +40,8 @@ static void	initiate(char **argv, t_program *prog, \
 	pthread_mutex_init(&prog->meal_lock, NULL);
 	pthread_mutex_init(&prog->write_lock, NULL);
 	prog->philos = malloc(sizeof(t_philo) * n);
+	if (!prog->philos)
+		return ;
 	while (++i < n)
 		pthread_mutex_init(&forks[i], NULL);
 	i = 0;
@@ -66,7 +70,7 @@ static void	threading(t_program *prog)
 		(void *)&prog->philos[n]);
 		{
 			n++;
-			ft_usleep(100);
+			ft_usleep(10);
 		}
 	}
 	n = 0;
@@ -100,7 +104,7 @@ int	main(int argc, char **argv)
 	initiate(argv, prog, forks, n);
 	if (prog->philos[0].time_to_eat < prog->philos[0].time_to_die)
 		threading(prog);
-	// n = 0;
+	n = 0;
 	// while (n < prog->philos[0].num_of_philos)
 	// {
 	// 	printf("%d %d %p %p\n", prog->philos[n].meals_eaten, prog->philos[n].num_times_to_eat, prog->philos[n].l_fork, prog->philos[n].r_fork);
