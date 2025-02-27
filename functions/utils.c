@@ -6,22 +6,37 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 14:40:47 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/24 16:39:51 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/27 16:02:05 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
-int	is_he_dead(t_philo *philo)
+void	printing(t_philo *philo)
 {
-	pthread_mutex_lock(philo->dead_lock);
-	if (philo->prog->dead_flag == 1)
+	if (philo->eating == 0)
 	{
-		pthread_mutex_unlock(philo->dead_lock);
-		return (1);
+		pthread_mutex_lock(philo->write_lock);
+		printf("%zu philo %d took his left fork\n",
+			get_current_time(), philo->id);
+		printf("%zu philo %d took his right fork\n",
+			get_current_time(), philo->id);
+		printf("%zu philo %d is eating\n", get_current_time(), philo->id);
+		pthread_mutex_unlock(philo->write_lock);
+		philo->eating = 1;
+		return ;
 	}
-	pthread_mutex_unlock(philo->dead_lock);
-	return (0);
+	else
+	{
+		pthread_mutex_lock(philo->write_lock);
+		printf("%zu philo %d dropped his left fork\n",
+			get_current_time(), philo->id);
+		printf("%zu philo %d dropped his right fork\n",
+			get_current_time(), philo->id);
+		pthread_mutex_unlock(philo->write_lock);
+		philo->eating = 0;
+		return ;
+	}
 }
 
 void	free_and_destroy(t_program *prog, pthread_mutex_t *forks, int n)
@@ -32,12 +47,13 @@ void	free_and_destroy(t_program *prog, pthread_mutex_t *forks, int n)
 	pthread_mutex_destroy(&prog->dead_lock);
 	pthread_mutex_destroy(&prog->meal_lock);
 	pthread_mutex_destroy(&prog->write_lock);
+	pthread_mutex_destroy(&prog->total_lock);
+	pthread_mutex_destroy(&prog->starting_lock);
 	while (i < n)
 	{
 		pthread_mutex_destroy(&forks[i]);
 		i++;
 	}
-	i = 0;
 	if (prog->philos)
 		free(prog->philos);
 	free(prog);
@@ -47,9 +63,11 @@ void	free_and_destroy(t_program *prog, pthread_mutex_t *forks, int n)
 size_t	get_current_time(void)
 {
 	struct timeval	tv;
+	size_t			time;
 
 	gettimeofday(&tv, NULL);
-	return ((tv.tv_sec * 1000) + (tv.tv_usec / 1000));
+	time = (tv.tv_sec * 1000) + (tv.tv_usec / 1000);
+	return (time);
 }
 
 int	ft_usleep(size_t milliseconds)
@@ -64,27 +82,21 @@ int	ft_usleep(size_t milliseconds)
 
 int	ft_atoi(const char *str)
 {
-	int	i;
-	int	f;
-	int	c;
+	int		i;
+	long	f;
 
 	i = 0;
 	f = 0;
-	c = 1;
-	if (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
-		return (0);
-	if (str[i] == 43 || str[i] == 45)
-	{
-		if (str[i] == 45)
-			c = -1;
+	if (str[i] == '+')
 		i++;
-	}
-	while (str[i] >= 48 && str[i] <= 57)
+	while (str[i] >= '0' && str[i] <= '9')
 	{
 		f = f * 10 + (str[i] - '0');
 		i++;
 	}
+	if (f > INT_MAX)
+		return (0);
 	if (str[i] != '\0')
 		return (0);
-	return (f * c);
+	return ((int)f);
 }

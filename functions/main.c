@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/24 16:39:54 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/02/27 15:49:02 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,8 @@
 static void	initiate_rest(char **argv, t_program *prog, \
 	pthread_mutex_t *forks, int i)
 {
-	prog->philos[i].start_time = get_current_time();
+	prog->philos[i].time = 0;
+	prog->philos[i].time_to_sleep = ft_atoi(argv[4]);
 	if (argv[5] != NULL)
 		prog->philos[i].num_times_to_eat = ft_atoi(argv[5]);
 	else
@@ -26,7 +27,12 @@ static void	initiate_rest(char **argv, t_program *prog, \
 	prog->philos[i].write_lock = &prog->write_lock;
 	prog->philos[i].dead_lock = &prog->dead_lock;
 	prog->philos[i].meal_lock = &prog->meal_lock;
+	prog->philos[i].total_lock = &prog->total_lock;
+	prog->philos[i].starting_lock = &prog->starting_lock;
 	prog->philos[i].prog = prog;
+	prog->philos[i].eating = 0;
+	prog->philos[i].time_to_die = ft_atoi(argv[2]);
+	prog->philos[i].time_to_eat = ft_atoi(argv[3]);
 }
 
 static void	initiate(char **argv, t_program *prog, \
@@ -39,6 +45,8 @@ static void	initiate(char **argv, t_program *prog, \
 	pthread_mutex_init(&prog->dead_lock, NULL);
 	pthread_mutex_init(&prog->meal_lock, NULL);
 	pthread_mutex_init(&prog->write_lock, NULL);
+	pthread_mutex_init(&prog->total_lock, NULL);
+	pthread_mutex_init(&prog->starting_lock, NULL);
 	prog->philos = malloc(sizeof(t_philo) * n);
 	if (!prog->philos)
 		return ;
@@ -50,13 +58,11 @@ static void	initiate(char **argv, t_program *prog, \
 		prog->philos[i].id = i;
 		prog->philos[i].meals_eaten = 0;
 		prog->philos[i].last_meal = get_current_time();
-		prog->philos[i].time_to_die = ft_atoi(argv[2]);
-		prog->philos[i].time_to_eat = ft_atoi(argv[3]);
-		prog->philos[i].time_to_sleep = ft_atoi(argv[4]);
 		prog->philos[i].num_of_philos = n;
 		initiate_rest(argv, prog, forks, i);
 		i++;
 	}
+	prog->total = 0;
 }
 
 static void	threading(t_program *prog)
@@ -64,14 +70,12 @@ static void	threading(t_program *prog)
 	int	n;
 
 	n = 0;
+	set_starting(prog, 1);
 	while (n < prog->philos[0].num_of_philos)
 	{
 		pthread_create(&prog->philos[n].thread, NULL, &start, \
 		(void *)&prog->philos[n]);
-		{
-			n++;
-			ft_usleep(10);
-		}
+		n++;
 	}
 	n = 0;
 	while (n < prog->philos[0].num_of_philos)
@@ -91,7 +95,7 @@ int	main(int argc, char **argv)
 		return (printf("Wrong arguments\n"), 1);
 	n = ft_atoi(argv[1]);
 	if (n <= 0)
-		return (1);
+		return (printf("wrong philos, might be negative\n"), 1);
 	prog = malloc(sizeof(t_program));
 	if (!prog)
 		return (1);
@@ -102,13 +106,8 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	initiate(argv, prog, forks, n);
-	if (prog->philos[0].time_to_eat < prog->philos[0].time_to_die)
-		threading(prog);
-	n = 0;
-	// while (n < prog->philos[0].num_of_philos)
-	// {
-	// 	printf("%d %d %p %p\n", prog->philos[n].meals_eaten, prog->philos[n].num_times_to_eat, prog->philos[n].l_fork, prog->philos[n].r_fork);
-	// 	n++;
-	// }
+	if (valid(prog, forks, n) == 1)
+		return (1);
+	threading(prog);
 	free_and_destroy(prog, forks, n);
 }
