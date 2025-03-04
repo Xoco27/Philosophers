@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/26 11:31:11 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/27 15:59:02 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:38:24 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,13 +32,14 @@ void	set_starting(t_program *prog, int running)
 void	cannot_eat(t_philo *philo)
 {
 	pthread_mutex_lock(philo->l_fork);
-	printf("%zu philo %d took his left fork\n",
-		get_current_time(), philo->id);
-	ft_usleep(philo->time_to_die);
-	philo->dead = 1;
+	if (philo->prog->dead_flag == 0)
+		printf("%zu philo %d took his left fork\n",
+			get_current_time(), philo->id);
+	ft_usleep(philo->time_to_die, philo);
+	if (philo->prog->dead_flag == 0)
+		printf("%zu philo %d DIED NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n",
+			get_current_time(), philo->id);
 	philo->prog->dead_flag = 1;
-	printf("%zu philo %d DIED NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n",
-		get_current_time(), philo->id);
 	pthread_mutex_unlock(philo->l_fork);
 }
 
@@ -49,4 +50,26 @@ void	destroy(t_program *prog)
 	pthread_mutex_destroy(&prog->write_lock);
 	pthread_mutex_destroy(&prog->total_lock);
 	pthread_mutex_destroy(&prog->starting_lock);
+}
+
+void	check_usleep(t_philo *philo, int i)
+{
+	pthread_mutex_lock(philo->meal_lock);
+	if (get_current_time() - philo->prog->philos[i].last_meal
+		> philo->prog->philos[i].time_to_die)
+	{
+		pthread_mutex_unlock(philo->meal_lock);
+		pthread_mutex_lock(philo->dead_lock);
+		pthread_mutex_lock(philo->write_lock);
+		if (philo->prog->dead_flag == 0)
+			printf("%zu philo %d DIED NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n",
+				get_current_time(), philo->id);
+		pthread_mutex_unlock(philo->write_lock);
+		philo->dead = 1;
+		philo->prog->dead_flag = 1;
+		set_starting(philo->prog, 0);
+		pthread_mutex_unlock(philo->dead_lock);
+		return ;
+	}
+	pthread_mutex_unlock(philo->meal_lock);
 }

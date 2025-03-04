@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/27 15:49:02 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:35:08 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,6 +33,7 @@ static void	initiate_rest(char **argv, t_program *prog, \
 	prog->philos[i].eating = 0;
 	prog->philos[i].time_to_die = ft_atoi(argv[2]);
 	prog->philos[i].time_to_eat = ft_atoi(argv[3]);
+	prog->philos[i].meals_eaten = 0;
 }
 
 static void	initiate(char **argv, t_program *prog, \
@@ -56,7 +57,6 @@ static void	initiate(char **argv, t_program *prog, \
 	while (i < n)
 	{
 		prog->philos[i].id = i;
-		prog->philos[i].meals_eaten = 0;
 		prog->philos[i].last_meal = get_current_time();
 		prog->philos[i].num_of_philos = n;
 		initiate_rest(argv, prog, forks, i);

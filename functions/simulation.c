@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:33:29 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/27 16:02:36 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:35:08 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ static void	philo_eating(t_philo *philo)
 	philo->last_meal = get_current_time();
 	philo->meals_eaten++;
 	pthread_mutex_unlock(philo->meal_lock);
-	ft_usleep(philo->time_to_eat);
+	ft_usleep(philo->time_to_eat, philo);
 	if (check_others(philo) == 1)
 		return ;
 	pthread_mutex_unlock(philo->l_fork);
@@ -45,20 +45,23 @@ static void	philo_sleeping(t_philo *philo)
 	if (is_he_dead(philo) == 1)
 		return ;
 	pthread_mutex_lock(philo->write_lock);
-	printf("%zu philo %d is sleeping\n", get_current_time(), philo->id);
+	if (philo->prog->dead_flag == 0)
+		printf("%zu philo %d is sleeping\n", get_current_time(), philo->id);
 	pthread_mutex_unlock(philo->write_lock);
-	ft_usleep(philo->time_to_sleep);
+	ft_usleep(philo->time_to_sleep, philo);
 	if (is_he_dead(philo) == 1)
 		return ;
 	if (get_current_time() - philo->last_meal >= philo->time_to_die)
 	{
 		pthread_mutex_lock(philo->dead_lock);
+		pthread_mutex_lock(philo->write_lock);
+		if (philo->prog->dead_flag == 0)
+			printf("%zu philo %d DIED NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n",
+				get_current_time(), philo->id);
+		pthread_mutex_unlock(philo->write_lock);
 		philo->dead = 1;
 		philo->prog->dead_flag = 1;
-		pthread_mutex_lock(philo->write_lock);
-		printf("%zu philo %d DIED NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO\n",
-			get_current_time(), philo->id);
-		pthread_mutex_unlock(philo->write_lock);
+		set_starting(philo->prog, 0);
 		pthread_mutex_unlock(philo->dead_lock);
 		return ;
 	}
@@ -68,8 +71,11 @@ static int	philo_thinking(t_philo *philo)
 {
 	int	time_to_think;
 
+	pthread_mutex_lock(philo->dead_lock);
 	pthread_mutex_lock(philo->write_lock);
-	printf("%zu philo %d is thinking\n", get_current_time(), philo->id);
+	if (philo->prog->dead_flag == 0)
+		printf("%zu philo %d is thinking\n", get_current_time(), philo->id);
+	pthread_mutex_unlock(philo->dead_lock);
 	pthread_mutex_unlock(philo->write_lock);
 	time_to_think = philo->time_to_die - (get_current_time() - philo->last_meal)
 		- philo->time_to_eat / 2;
@@ -79,6 +85,7 @@ static int	philo_thinking(t_philo *philo)
 		time_to_think = 1;
 	if (time_to_think > 600)
 		time_to_think = 200;
+	ft_usleep(time_to_think, philo);
 	if (is_he_dead(philo) == 1)
 		return (1);
 	return (0);

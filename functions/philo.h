@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:54:45 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/02/27 15:58:55 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/03/03 18:35:07 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,7 @@ int		ft_atoi(const char *str);
 void	*start(void *prog);
 size_t	get_current_time(void);
 void	free_and_destroy(t_program *prog, pthread_mutex_t *forks, int n);
-int		ft_usleep(size_t milliseconds);
+int		ft_usleep(size_t milliseconds, t_philo *philo);
 int		is_he_dead(t_philo *philo);
 int		check_others(t_philo *philo);
 void	died_eating(t_philo *philo);
@@ -72,5 +72,6 @@ void	set_starting(t_program *prog, int running);
 void	cannot_eat(t_philo *philo);
 int		valid(t_program *prog, pthread_mutex_t *forks, int n);
 void	destroy(t_program *prog);
+void	check_usleep(t_philo *philo, int i);
 
 #endif
