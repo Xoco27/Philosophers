@@ -1,45 +1,29 @@
-NAME = philosophers
+NAME = philo
 
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
 SRC_DIR = functions
 OBJ_DIR = obj
-LIBFT_DIR = libft
-PRINTF_DIR = ft_printf
 
-PHILO = $(wildcard $(SRC_DIR)/*.c)
+PHILO = functions/check.c functions/main.c functions/running.c functions/simulation.c \
+	functions/utils.c
 
 OBJS = $(PHILO:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
 
-LIBFT = $(LIBFT_DIR)/libft.a
-PRINTF = $(PRINTF_DIR)/libftprintf.a
-
-INCLUDES = -I$(LIBFT_DIR) -I$(PRINTF_DIR)
-
 all: $(NAME)
 
-$(NAME): $(OBJS) $(LIBFT) $(PRINTF)
-	$(CC) $(CFLAGS) -o $(NAME) $(OBJS) $(LIBFT) $(PRINTF)
+$(NAME): $(OBJS)
+	$(CC) $(CFLAGS) -o $(NAME) $(OBJS)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(dir $@)
-	$(CC) $(CFLAGS) -c $< -o $@ $(INCLUDES)
-
-$(LIBFT):
-	$(MAKE) -C $(LIBFT_DIR)
-	
-$(PRINTF):
-	$(MAKE) -C $(PRINTF_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	$(MAKE) clean -C $(LIBFT_DIR)
-	$(MAKE) clean -C $(PRINTF_DIR)
 	rm -rf $(OBJ_DIR)
 
 fclean: clean
-	$(MAKE) fclean -C $(LIBFT_DIR)
-	$(MAKE) fclean -C $(PRINTF_DIR)
 	rm -f $(NAME)
 
 re: fclean all

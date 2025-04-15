@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/03/03 18:35:08 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/03/04 14:27:45 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -109,5 +109,7 @@ int	main(int argc, char **argv)
 	if (valid(prog, forks, n) == 1)
 		return (1);
 	threading(prog);
+	if (prog->dead_flag == 0 && prog->philos[0].num_times_to_eat > 0)
+		printf("They all ate %d times.\n", prog->philos[0].num_times_to_eat);
 	free_and_destroy(prog, forks, n);
 }
