@@ -6,16 +6,22 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:53:52 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/03/04 14:27:45 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:39:57 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philo.h"
 
+void	count_time(t_philo *philo)
+{
+	pthread_mutex_lock(philo->write_lock);
+	philo->prog->time = get_current_time() - philo->prog->start;
+	pthread_mutex_unlock(philo->write_lock);
+}
+
 static void	initiate_rest(char **argv, t_program *prog, \
 	pthread_mutex_t *forks, int i)
 {
-	prog->philos[i].time = 0;
 	prog->philos[i].time_to_sleep = ft_atoi(argv[4]);
 	if (argv[5] != NULL)
 		prog->philos[i].num_times_to_eat = ft_atoi(argv[5]);
@@ -34,6 +40,7 @@ static void	initiate_rest(char **argv, t_program *prog, \
 	prog->philos[i].time_to_die = ft_atoi(argv[2]);
 	prog->philos[i].time_to_eat = ft_atoi(argv[3]);
 	prog->philos[i].meals_eaten = 0;
+	prog->start = get_current_time();
 }
 
 static void	initiate(char **argv, t_program *prog, \
@@ -56,6 +63,7 @@ static void	initiate(char **argv, t_program *prog, \
 	i = 0;
 	while (i < n)
 	{
+		prog->time = 0;
 		prog->philos[i].id = i;
 		prog->philos[i].last_meal = get_current_time();
 		prog->philos[i].num_of_philos = n;

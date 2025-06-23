@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/14 11:54:45 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/03/03 18:35:07 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:40:10 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@ typedef struct s_philo
 	size_t				time_to_die;
 	size_t				time_to_eat;
 	size_t				time_to_sleep;
-	int					time;
 	int					num_of_philos;
 	int					num_times_to_eat;
 	int					dead;
@@ -48,6 +47,8 @@ typedef struct s_program
 	int				dead_flag;
 	int				starting;
 	int				total;
+	size_t			time;
+	size_t			start;
 	pthread_mutex_t	dead_lock;
 	pthread_mutex_t	meal_lock;
 	pthread_mutex_t	write_lock;
@@ -73,5 +74,6 @@ void	cannot_eat(t_philo *philo);
 int		valid(t_program *prog, pthread_mutex_t *forks, int n);
 void	destroy(t_program *prog);
 void	check_usleep(t_philo *philo, int i);
+void	count_time(t_philo *philo);
 
 #endif

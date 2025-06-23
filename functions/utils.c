@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 14:40:47 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/03/03 18:38:23 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/23 16:49:30 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,15 @@
 
 void	printing(t_philo *philo)
 {
+	count_time(philo);
 	if (philo->eating == 0 && philo->prog->dead_flag == 0)
 	{
 		pthread_mutex_lock(philo->write_lock);
 		printf("%zu philo %d took his left fork\n",
-			get_current_time(), philo->id);
+			philo->prog->time, philo->id);
 		printf("%zu philo %d took his right fork\n",
-			get_current_time(), philo->id);
-		printf("%zu philo %d is eating\n", get_current_time(), philo->id);
+			philo->prog->time, philo->id);
+		printf("%zu philo %d is eating\n", philo->prog->time, philo->id);
 		pthread_mutex_unlock(philo->write_lock);
 		philo->eating = 1;
 		return ;
@@ -30,9 +31,9 @@ void	printing(t_philo *philo)
 	{
 		pthread_mutex_lock(philo->write_lock);
 		printf("%zu philo %d dropped his left fork\n",
-			get_current_time(), philo->id);
+			philo->prog->time, philo->id);
 		printf("%zu philo %d dropped his right fork\n",
-			get_current_time(), philo->id);
+			philo->prog->time, philo->id);
 		pthread_mutex_unlock(philo->write_lock);
 		philo->eating = 0;
 		return ;
@@ -90,6 +91,7 @@ int	ft_usleep(size_t milliseconds, t_philo *philo)
 		}
 		usleep(500);
 	}
+	count_time(philo);
 	return (0);
 }
 
