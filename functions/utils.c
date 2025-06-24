@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/17 14:40:47 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/06/23 16:49:30 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/24 15:49:20 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ int	ft_usleep(size_t milliseconds, t_philo *philo)
 		i = 0;
 		while (i < philo->num_of_philos)
 		{
-			check_usleep(philo, i);
+			check_usleep(&philo->prog->philos[i], i);
 			if (begin(philo->prog) == 0)
 				return (1);
 			if (is_he_dead(philo) == 1)

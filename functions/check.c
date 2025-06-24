@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/25 12:22:04 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/06/23 16:31:52 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/24 15:52:29 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,6 +79,7 @@ int	is_he_dead(t_philo *philo)
 
 void	died_eating(t_philo *philo)
 {
+	count_time(philo);
 	pthread_mutex_unlock(philo->l_fork);
 	pthread_mutex_unlock(philo->r_fork);
 	pthread_mutex_lock(philo->write_lock);

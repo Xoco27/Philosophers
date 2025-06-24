@@ -6,7 +6,7 @@
 /*   By: cfleuret <cfleuret@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/02/18 11:33:29 by cfleuret          #+#    #+#             */
-/*   Updated: 2025/06/23 16:51:06 by cfleuret         ###   ########.fr       */
+/*   Updated: 2025/06/24 15:51:37 by cfleuret         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ static void	philo_sleeping(t_philo *philo)
 		return ;
 	if (get_current_time() - philo->last_meal >= philo->time_to_die)
 	{
+		count_time(philo);
 		pthread_mutex_lock(philo->dead_lock);
 		pthread_mutex_lock(philo->write_lock);
 		if (philo->prog->dead_flag == 0)
